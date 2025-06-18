@@ -13,6 +13,10 @@ df['Data'] = pd.to_datetime(df['Data'])
 options = list(df['ID Loja'].unique())
 options.append("Todas as Lojas")
 
+# Valores mínimos e máximos da coluna Data para configurar o DatePickerRange
+min_date = df['Data'].min()
+max_date = df['Data'].max()
+
 # Indicadores (KPIs)
 total_produtos = df['Quantidade'].sum()
 n_lojas = df['ID Loja'].nunique()
@@ -42,6 +46,16 @@ app.layout = dbc.Container(children=[
 
     dcc.Dropdown(options, value='Todas as Lojas', id='lista_Lojas', className='mb-4'),
 
+    dcc.DatePickerRange(
+        id='seletor_data',
+        start_date=min_date,
+        end_date=max_date,
+        min_date_allowed=min_date,
+        max_date_allowed=max_date,
+        display_format='DD/MM/YYYY',
+        className='mb-4'
+    ),
+
     dcc.Graph(
         id='grafico_qtde_vendas',
         figure=fig
@@ -51,14 +65,15 @@ app.layout = dbc.Container(children=[
 # Callback para atualizar gráfico
 @app.callback(
     Output('grafico_qtde_vendas', 'figure'),
-    Input('lista_Lojas', 'value')
+    Input('lista_Lojas', 'value'),
+    Input('seletor_data', 'start_date'),
+    Input('seletor_data', 'end_date')
 )
-def update_output(value):
-    if value == 'Todas as Lojas':
-        fig = px.bar(df, x="Produto", y="Quantidade", color="ID Loja", barmode="group")
-    else:
-        tabela_filtrada = df.loc[df['ID Loja']==value, :]
-        fig = px.bar(tabela_filtrada, x="Produto", y="Quantidade", color="ID Loja", barmode="group")
+def update_output(loja, start_date, end_date):
+    tabela_filtrada = df[(df['Data'] >= start_date) & (df['Data'] <= end_date)]
+    if loja != 'Todas as Lojas':
+        tabela_filtrada = tabela_filtrada[tabela_filtrada['ID Loja'] == loja]
+    fig = px.bar(tabela_filtrada, x="Produto", y="Quantidade", color="ID Loja", barmode="group")
     return fig
 
 if __name__ == '__main__':
