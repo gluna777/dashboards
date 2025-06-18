@@ -15,11 +15,9 @@ df = pd.DataFrame({
 fig = px.bar(df, x="Fruit", y="Amount", color="City", barmode="group")
 
 app.layout = html.Div(children=[
-    html.H1(children='Hello Dash'),
-
-    html.Div(children='''
-        Dash: A web application framework for your data.
-    '''),
+    html.H1(children='Faturamento das lojas'),
+    html.H2(children='Gráfico com faturamento de todos os produtos separados por loja'),
+    html.Div(children='OBS: Gráfico mostra quantidade de produtos vendidos, não o faturamento'),
 
     dcc.Graph(
         id='example-graph',
