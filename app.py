@@ -1,7 +1,8 @@
-from dash import Dash, html, dcc, Input, Output 
+from dash import Dash, html, dcc, Input, Output, State, ctx, dash_table, no_update 
 import plotly.express as px 
 import pandas as pd  
 import dash_bootstrap_components as dbc
+from dash.dcc import send_data_frame
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
@@ -59,7 +60,11 @@ app.layout = dbc.Container(children=[
     dcc.Graph(
         id='grafico_qtde_vendas',
         figure=fig
-    )
+    ),
+
+    html.Button("Exportar CSV", id="botao_exportar", className='btn btn-success mt-3'),
+    dcc.Download(id="download_dados")
+
 ], fluid=True)
 
 # Callback para atualizar gráfico
@@ -75,6 +80,24 @@ def update_output(loja, start_date, end_date):
         tabela_filtrada = tabela_filtrada[tabela_filtrada['ID Loja'] == loja]
     fig = px.bar(tabela_filtrada, x="Produto", y="Quantidade", color="ID Loja", barmode="group")
     return fig
+
+# Callback para exportar CSV
+@app.callback(
+    Output("download_dados", "data"),
+    Input("botao_exportar", "n_clicks"),
+    State('lista_Lojas', 'value'),
+    State('seletor_data', 'start_date'),
+    State('seletor_data', 'end_date'),
+    prevent_initial_call=True
+)
+def exportar_csv(n_clicks, loja, start_date, end_date):
+    # Filtra a tabela
+    tabela_filtrada = df[(df['Data'] >= start_date) & (df['Data'] <= end_date)]
+
+    if loja != 'Todas as Lojas':
+        tabela_filtrada = tabela_filtrada[tabela_filtrada['ID Loja'] == loja]
+
+    return send_data_frame(tabela_filtrada.to_csv, "dados_filtrados.csv", index=False)
 
 if __name__ == '__main__':
     app.run(debug=True)
