@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 📊 Dashboard de Vendas
 
 Este projeto é um dashboard interativo construído com **Dash**, **Plotly** e **Bootstrap**, que permite a visualização das vendas de produtos por loja. Os usuários podem filtrar as informações por loja e por intervalo de datas, além de exportar os dados filtrados.
@@ -66,3 +67,4 @@ ACESSE NO NAVEGADOR, O LINK QUE APARECERÁ NO TERMINAL APÓS A EXECUÇÃO DO CÓ
 - Dash Bootstrap Components
 
 ---
+
